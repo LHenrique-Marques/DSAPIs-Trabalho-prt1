@@ -1,0 +1,10 @@
+const express = require("express");
+const rota = express.Router();
+const livro_controller = require("../controllers/livro.js");
+rota.get("/", livro_controller.listar_livro_controller);
+rota.post("/", livro_controller.cadastrar_livro_controller);
+rota.post("/deletar/:id", livro_controller.deletar_livro_controller);
+rota.put("/atualizar/:id", livro_controller.atualizar_livro_controller);
+rota.put("/retirar/", livro_controller.retirar_livro_controller);
+rota.put("/devolver/", livro_controller.devolver_livro_controller);
+module.exports = rota;
