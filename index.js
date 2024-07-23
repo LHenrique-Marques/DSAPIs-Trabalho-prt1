@@ -1,6 +1,6 @@
 const express = require('express');
 const indx = express();
-const porta = 3000;
+const porta = 8800;
 const autor_router = require('./routes/autor.js'); 
 const livro_router = require('./routes/livro.js'); 
 const usuario_router = require('./routes/usuario.js'); 

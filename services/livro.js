@@ -1,78 +1,81 @@
 const livro_repository = require('../repository/livro');
 const usuario_repository = require('../repository/usuario');
-function listar_livro_service(){
-    let dados = livro_repository.listar_livros_repository();
-    if(dados){
-        return dados;
-    }
-    else{
-        throw new Error("Sem livros.");
+
+async function listar_livros_service() {
+    try {
+        return await livro_repository.listar_livros_repository();
+    } catch (err) {
+        console.error('Erro ao listar livros:', err.message);
+        throw new Error("Não foi possível listar livros.");
     }
 }
-function cadastrar_livro_service(livro) {
-    if(!livro.titulo || !livro.autor || !livro.ano){
-        throw new Error("Titulo,autor e ano são obrigatorios.");
-    }
-    let novo_livro = livro_repository.cadastrar_livro_repository(livro);
-    if(novo_livro){
-        return novo_livro;
-    }
-    else{
-        throw new Error("Erro ao cadastrar livro.");
-    }
-};
-function deletar_livro_service(id) {
-    let livro = livro_repository.remover_livro_repository(id);
-    if(livro){
-        return livro;
-    }
-    else{
-        throw new Error("livro inexistente.");
-    }
-};
-function atualizar_livro_service(atributo, atributo_atualizado, id) {
-    if(["id","titulo", "autor","ano"].includes(atributo)){
-        const lista_atualizada = livro_repository.atualizar_livro_repository(id,atributo, atributo_atualizado);
-        if(lista_atualizada){
-            return lista_atualizada;
-        } 
-    } 
-    else{
-        throw new Error("Não foi possível atualizar o livro.");
-    }
-};
-function retirar_livro_service(usuarioid, livroid) {
-    const livro = livro_repository.livros.find(l => l.id == livroid)
-    const usuario = usuario_repository.usuarios.find(l => l.id == usuarioid)
-    if(!livro || livro.disponivel != true){
-        throw new Error("O livro não está disponível para retirada.");
-    }
-    if(!usuario || usuario.livros.length >= 3){
-        throw new Error("O usuário já possui o máximo de livros permitidos.");
-    }
-    return livro_repository.retirar_livro_repository(usuarioid, livroid);
-};
-function devolver_livro_service(usuarioid, livroid) {
-    const livro = livro_repository.livros.find(l => l.id == livroid)
-    const usuario = usuario_repository.usuarios.find(l => l.id == usuarioid)
-    const livro_alugado = usuario.livros.find(l => l.id === livro.id);
-    if (!livro_alugado) {
-        throw new Error("Este livro não está alugado para este usuário.");
-    }
-    const data_atual = new Date();
 
-    if (livro_alugado.data_entrega && livro_alugado.data_entrega < data_atual) {
-        const soma_dias = Math.ceil((data_atual - livro_alugado.data_entrega) / (1000 * 60 * 60 * 24));
-        console.log(`Atenção: Você está devolvendo o livro com ${soma_dias} dias de atraso.`);
+async function cadastrar_livro_service(livro) {
+    if (livro && livro.titulo && livro.autor && livro.ano) {
+        try {
+            return await livro_repository.cadastrar_livro_repository(livro);
+        } catch (err) {
+            console.error('Erro ao cadastrar livro:', err.message);
+            throw new Error("Não foi possível cadastrar o livro.");
+        }
+    } else {
+        throw new Error("Livro deve ter título, autor e ano.");
     }
-    return livro_repository.devolver_livro_repository(usuarioid, livroid);
-};
+}
+
+async function deletar_livro_service(id) {
+    try {
+        const livro_deletado = await livro_repository.deletar_livro_repository(id);
+        if (!livro_deletado) {
+            throw new Error("Livro não encontrado para exclusão.");
+        }
+        return livro_deletado;
+    } catch (err) {
+        console.error('Erro ao deletar livro:', err.message);
+        throw new Error("Não foi possível deletar o livro.");
+    }
+}
+
+async function atualizar_livro_service(id, livro) {
+    if (livro && livro.titulo && livro.autor && livro.ano) {
+        try {
+            const livro_atualizado = await livro_repository.atualizar_livro_repository(id, livro);
+            if (!livro_atualizado) {
+                throw new Error("Livro não encontrado para atualização.");
+            }
+            return livro_atualizado;
+        } catch (err) {
+            console.error('Erro ao atualizar livro:', err.message);
+            throw new Error("Não foi possível atualizar o livro.");
+        }
+    } else {
+        throw new Error("Livro deve ter título, autor e ano.");
+    }
+}
+
+async function retirar_livro_service(id_usuario, id_livro) {
+    try {
+        return await livro_repository.retirar_livro_repository(id_usuario, id_livro);
+    } catch (err) {
+        console.error('Erro ao retirar livro:', err.message);
+        throw new Error("Não foi possível retirar o livro.");
+    }
+}
+
+async function devolver_livro_service(id_usuario, id_livro) {
+    try {
+        return await livro_repository.devolver_livro_repository(id_usuario, id_livro);
+    } catch (err) {
+        console.error('Erro ao devolver livro:', err.message);
+        throw new Error("Não foi possível devolver o livro.");
+    }
+}
+
 module.exports = {
-    listar_livro_service,
+    listar_livros_service,
     cadastrar_livro_service,
     deletar_livro_service,
     atualizar_livro_service,
     retirar_livro_service,
     devolver_livro_service
-    
 };
