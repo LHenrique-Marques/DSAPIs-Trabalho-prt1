@@ -25,7 +25,7 @@ async function buscar_por_id_repository(id) {
     const cliente = new Client(conexao);
     try {
         await cliente.connect();
-        const sql = "SELECT * FROM autor WHERE id=$1";
+        const sql = "SELECT * FROM autor WHERE id_autor=$1";
         const valores = [id];
         const resultado = await cliente.query(sql, valores);
         if (resultado.rows.length === 0) {
@@ -60,7 +60,7 @@ async function atualizar_autor_repository(id, autor) {
     const cliente = new Client(conexao);
     try {
         await cliente.connect();
-        const sql = 'UPDATE autor SET nome=$1, nacionalidade=$2 WHERE id=$3 RETURNING *';
+        const sql = 'UPDATE autor SET nome=$1, nacionalidade=$2 WHERE id_autor=$3 RETURNING *';
         const valores = [autor.nome, autor.nacionalidade, id];
         const resultado = await cliente.query(sql, valores);
         if (resultado.rows.length === 0) {
@@ -79,7 +79,7 @@ async function deletar_autor_repository(id) {
     const cliente = new Client(conexao);
     try {
         await cliente.connect();
-        const sql = 'DELETE FROM autor WHERE id=$1 RETURNING *';
+        const sql = 'DELETE FROM autor WHERE id_autor=$1 RETURNING *';
         const valores = [id];
         const resultado = await cliente.query(sql, valores);
         if (resultado.rows.length === 0) {
